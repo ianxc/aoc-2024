@@ -1,4 +1,4 @@
-package com.ianxc;
+package com.ianxc.aoc;
 
 public class Main {
     public static void main(String[] args) {
