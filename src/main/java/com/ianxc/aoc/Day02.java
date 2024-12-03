@@ -2,8 +2,6 @@ package com.ianxc.aoc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class Day02 {
     static int part1(String path) {
