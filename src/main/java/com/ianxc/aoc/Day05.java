@@ -1,13 +1,15 @@
 package com.ianxc.aoc;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Day05 {
-    record Pair(int left, int right) {
-    }
-
-
-    static int part1(String path) {
+    static Input parse(String path) {
         var deps = new ArrayList<Pair>();
         var updates = new ArrayList<List<Integer>>();
         var stage2 = false;
@@ -20,7 +22,6 @@ public class Day05 {
                 var strs = line.split(",");
                 var nums = Arrays.stream(strs).map(Integer::parseInt).toList();
                 updates.add(nums);
-//                System.out.println(nums);
             } else {
                 var strs = line.split("\\|");
                 var left = Integer.parseInt(strs[0]);
@@ -28,48 +29,53 @@ public class Day05 {
                 deps.add(new Pair(left, right));
             }
         }
+        return new Input(deps, updates);
+    }
 
-        System.out.println(deps);
-
+    static int part1(String path) {
+        final var input = parse(path);
+        final var deps = input.deps;
+        final var updates = input.updates;
 
         var graph = new HashMap<Integer, List<Integer>>();
-
         for (var d : deps) {
             graph.putIfAbsent(d.left, new ArrayList<>());
             graph.putIfAbsent(d.right, new ArrayList<>());
             graph.get(d.left).add(d.right);
         }
 
-        System.out.println(graph);
-        topologicalSort(graph);
+        return updates.stream()
+                .filter(seq -> isValid(graph, seq))
+                .mapToInt(Day05::middleElement)
+                .sum();
+    }
+
+    static int part2(String path) {
+        final var input = parse(path);
+        final var deps = input.deps;
+        final var updates = input.updates;
 
         return 0;
     }
 
-    private static void topologicalSort(Map<Integer, List<Integer>> graph) {
-        var processed = new ArrayList<Integer>();
-        var visited = new HashSet<Integer>();
-        for (var node : graph.keySet()) {
-            if (!visited.contains(node)) {
-                traverseGraph(graph, visited, node, processed);
-            }
+    static boolean isValid(Map<Integer, List<Integer>> graph, List<Integer> seq) {
+        var allInSeq = Set.copyOf(seq);
+        var unseenNeighbors = new HashSet<>();
+        for (var num : seq) {
+            unseenNeighbors.remove(num);
+            var numsToSee = graph.get(num).stream().filter(allInSeq::contains).toList();
+            unseenNeighbors.addAll(numsToSee);
         }
-        Collections.reverse(processed);
-        System.out.println("processed " + processed);
+        return unseenNeighbors.isEmpty();
     }
 
-    private static void traverseGraph(Map<Integer, List<Integer>> graph, Set<Integer> visited,
-                                      int node, List<Integer> processed) {
-        if (visited.contains(node)) {
-            return;
-        }
+    static int middleElement(List<Integer> seq) {
+        return seq.get(seq.size() / 2);
+    }
 
-        visited.add(node);
+    record Pair(int left, int right) {
+    }
 
-        for (int neighbour : graph.get(node)) {
-            traverseGraph(graph, visited, neighbour, processed);
-        }
-
-        processed.add(node);
+    record Input(List<Pair> deps, List<List<Integer>> updates) {
     }
 }
