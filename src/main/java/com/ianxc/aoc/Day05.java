@@ -2,6 +2,7 @@ package com.ianxc.aoc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,12 +38,7 @@ public class Day05 {
         final var deps = input.deps;
         final var updates = input.updates;
 
-        var graph = new HashMap<Integer, List<Integer>>();
-        for (var d : deps) {
-            graph.putIfAbsent(d.left, new ArrayList<>());
-            graph.putIfAbsent(d.right, new ArrayList<>());
-            graph.get(d.left).add(d.right);
-        }
+        var graph = graphFromDeps(deps);
 
         return updates.stream()
                 .filter(seq -> isValid(graph, seq))
@@ -55,7 +51,46 @@ public class Day05 {
         final var deps = input.deps;
         final var updates = input.updates;
 
-        return 0;
+        var graph = graphFromDeps(deps);
+        return updates.stream()
+                .filter(seq -> !isValid(graph, seq))
+                .map(seq -> {
+                    final var processed = new ArrayList<Integer>();
+                    final var visited = new HashSet<Integer>();
+                    for (var num : seq) {
+                        dfs(graph, processed, visited, Set.copyOf(seq), num);
+                    }
+                    Collections.reverse(processed);
+                    return processed;
+                })
+//                .peek(System.out::println)
+                .mapToInt(Day05::middleElement)
+                .sum();
+    }
+
+    static void dfs(Map<Integer, List<Integer>> graph, List<Integer> processed,
+                    Set<Integer> visited, Set<Integer> allInSeq, int current) {
+        if (visited.contains(current)) {
+            return;
+        }
+        visited.add(current);
+        graph.get(current)
+                .stream()
+                .filter(allInSeq::contains)
+                .forEach(neighbor -> {
+                    dfs(graph, processed, visited, allInSeq, neighbor);
+                });
+        processed.add(current);
+    }
+
+    static Map<Integer, List<Integer>> graphFromDeps(List<Pair> deps) {
+        var graph = new HashMap<Integer, List<Integer>>();
+        for (var d : deps) {
+            graph.putIfAbsent(d.left, new ArrayList<>());
+            graph.putIfAbsent(d.right, new ArrayList<>());
+            graph.get(d.left).add(d.right);
+        }
+        return graph;
     }
 
     static boolean isValid(Map<Integer, List<Integer>> graph, List<Integer> seq) {
