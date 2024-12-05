@@ -8,7 +8,9 @@ class Day05Test {
 
     @Test
     void testPart1() {
-        Day05.part1("day05/input.txt");
+        var res = Day05.part1("day05/input.txt");
+
+        assertEquals(5588, res);
     }
 
 }
