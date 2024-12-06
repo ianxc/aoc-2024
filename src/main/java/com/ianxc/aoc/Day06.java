@@ -2,7 +2,6 @@ package com.ianxc.aoc;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @SuppressWarnings("DuplicatedCode")
 public class Day06 {
@@ -102,15 +101,43 @@ public class Day06 {
     }
 
     static boolean tryPosition(List<String> input, int i, int j) {
-        var grid1 = input.stream().map(String::toCharArray).toArray(char[][]::new);
-        grid1[i][j] = '#';
-        var g1 = new GameState(grid1);
+        var grid = input.stream().map(String::toCharArray).toArray(char[][]::new);
+        var initial = findGuard(grid);
+        var x = initial.x;
+        var y = initial.y;
+        grid[i][j] = '#';
 
-        while (g1.stillRunning()) {
-            g1.makeMove();
-            if (g1.seenSameCoord) return true;
+        final var xMax = grid.length;
+        final var yMax = grid[0].length;
+        var visited = new HashSet<VisitedCoord>();
+        var currDir = Direction.UP;
+        var offset = offsetOf(currDir);
+        while (x >= 0 && x < xMax && y >= 0 && y < yMax) {
+            grid[x][y] = 'X';
+            var coord = new VisitedCoord(x, y, currDir);
+            if (visited.contains(coord))  {
+//                System.out.println("----------------------");
+//                grid[x][y] = '-';
+//                grid[i][j] = 'O';
+//                System.out.println(gridToStr(grid));
+                return true;
+            }
+            visited.add(coord);
+            var nextX = x + offset[0];
+            var nextY = y + offset[1];
+            if (!(nextX >= 0 && nextX < xMax)) break;
+            if (!(nextY >= 0 && nextY < yMax)) break;
+
+            if (grid[nextX][nextY] == '#') {
+                currDir = nextDirection(currDir);
+                offset = offsetOf(currDir);
+                // Turn *without* advancing yet (need to record visited).
+                nextX = x;
+                nextY = y;
+            }
+            x = nextX;
+            y = nextY;
         }
-
         return false;
     }
 
@@ -123,56 +150,5 @@ public class Day06 {
     }
 
     record VisitedCoord(int x, int y, Direction d) {
-    }
-
-    static class GameState {
-        char[][] grid;
-        int xMax;
-        int yMax;
-        int x;
-        int y;
-        Direction currDir;
-        int[] offset;
-        boolean seenSameCoord;
-        Set<VisitedCoord> visitedCoords;
-
-        public GameState(char[][] grid) {
-            this.grid = grid;
-            this.xMax = grid.length;
-            this.yMax = grid[0].length;
-            var initial = findGuard(grid);
-            this.x = initial.x;
-            this.y = initial.y;
-            this.currDir = Direction.UP;
-            this.offset = offsetOf(this.currDir);
-            this.seenSameCoord = false;
-            this.visitedCoords = new HashSet<>();
-        }
-
-        public boolean stillRunning() {
-            return x >= 0 && x < xMax && y >= 0 && y < yMax;
-        }
-
-        public void makeMove() {
-            if (!stillRunning()) {
-                return;
-            }
-            grid[x][y] = 'X';
-            var newlyVisited = new VisitedCoord(x, y, currDir);
-            if (this.visitedCoords.contains(newlyVisited)) {
-                seenSameCoord = true;
-            }
-            this.visitedCoords.add(newlyVisited);
-            var nextX = x + offset[0];
-            var nextY = y + offset[1];
-            if ((nextX >= 0 && nextX < xMax && nextY >= 0 && nextY < yMax) && grid[nextX][nextY] == '#') {
-                currDir = nextDirection(currDir);
-                offset = offsetOf(currDir);
-                nextX = x + offset[0];
-                nextY = y + offset[1];
-            }
-            x = nextX;
-            y = nextY;
-        }
     }
 }
