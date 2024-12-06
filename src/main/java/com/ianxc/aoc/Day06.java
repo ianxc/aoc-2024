@@ -30,8 +30,8 @@ public class Day06 {
             if (grid[nextX][nextY] == '#') {
                 currDir = nextDirection(currDir);
                 offset = offsetOf(currDir);
-                nextX = x + offset[0];
-                nextY = y + offset[1];
+                nextX = x;
+                nextY = y;
             }
             x = nextX;
             y = nextY;
