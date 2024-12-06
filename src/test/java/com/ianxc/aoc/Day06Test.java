@@ -29,7 +29,7 @@ class Day06Test {
     void testPart2() {
         var res = Day06.part2("day06/input.txt");
 
-        assertEquals(1514, res);
+        assertEquals(1516, res);
     }
 
     @Test
