@@ -23,4 +23,20 @@ class Day06Test {
 
         assertEquals(41, res);
     }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS)
+    void testPart2() {
+        var res = Day06.part2("day06/input.txt");
+
+        assertEquals(1554, res);
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS)
+    void testPart2demo() {
+        var res = Day06.part2("day06/demo.txt");
+
+        assertEquals(6, res);
+    }
 }
