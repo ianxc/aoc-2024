@@ -1,6 +1,8 @@
 package com.ianxc.aoc;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings("DuplicatedCode")
 public class Day06 {
@@ -101,30 +103,12 @@ public class Day06 {
 
     static boolean tryPosition(List<String> input, int i, int j) {
         var grid1 = input.stream().map(String::toCharArray).toArray(char[][]::new);
-        var grid2 = input.stream().map(String::toCharArray).toArray(char[][]::new);
-
         grid1[i][j] = '#';
-        grid2[i][j] = '#';
-
         var g1 = new GameState(grid1);
-        var g2 = new GameState(grid2);
 
-        while (g1.stillRunning() && g1.stillRunning()) {
+        while (g1.stillRunning()) {
             g1.makeMove();
-            g2.makeMove();
-            g2.makeMove();
-            if (g1.sameCoordsAs(g2)) {
-                g1.grid[g1.x][g1.y] = '\\';
-                g2.grid[g2.x][g2.y] = '\\';
-                g1.grid[i][j] = 'O';
-                g2.grid[i][j] = 'O';
-                System.out.println("-------------------");
-                System.out.println("g1:");
-                System.out.println(gridToStr(g1.grid));
-                System.out.println("g2:");
-                System.out.println(gridToStr(g2.grid));
-                return true;
-            }
+            if (g1.seenSameCoord) return true;
         }
 
         return false;
@@ -138,6 +122,9 @@ public class Day06 {
     record CoordState(int x, int y) {
     }
 
+    record VisitedCoord(int x, int y, Direction d) {
+    }
+
     static class GameState {
         char[][] grid;
         int xMax;
@@ -146,6 +133,8 @@ public class Day06 {
         int y;
         Direction currDir;
         int[] offset;
+        boolean seenSameCoord;
+        Set<VisitedCoord> visitedCoords;
 
         public GameState(char[][] grid) {
             this.grid = grid;
@@ -156,10 +145,8 @@ public class Day06 {
             this.y = initial.y;
             this.currDir = Direction.UP;
             this.offset = offsetOf(this.currDir);
-        }
-
-        public boolean sameCoordsAs(GameState other) {
-            return this.stillRunning() && other.stillRunning() && this.x == other.x && this.y == other.y;
+            this.seenSameCoord = false;
+            this.visitedCoords = new HashSet<>();
         }
 
         public boolean stillRunning() {
@@ -171,6 +158,11 @@ public class Day06 {
                 return;
             }
             grid[x][y] = 'X';
+            var newlyVisited = new VisitedCoord(x, y, currDir);
+            if (this.visitedCoords.contains(newlyVisited)) {
+                seenSameCoord = true;
+            }
+            this.visitedCoords.add(newlyVisited);
             var nextX = x + offset[0];
             var nextY = y + offset[1];
             if ((nextX >= 0 && nextX < xMax && nextY >= 0 && nextY < yMax) && grid[nextX][nextY] == '#') {
