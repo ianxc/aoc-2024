@@ -1,27 +1,28 @@
 package com.ianxc.aoc;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
-@SuppressWarnings("DuplicatedCode")
 public class Day07 {
     static long part1(String path) {
-        return Util.loadFile(path)
-                .parallelStream()
-                .map(s -> s.split(" "))
-                .map(xs -> {
-                    var desiredStr = xs[0].substring(0, xs[0].length() - 1);
-                    var components = Arrays.stream(xs).skip(1).mapToLong(Long::parseLong).toArray();
-                    return new Spec(Long.parseLong(desiredStr), components);
-                })
-//                .peek(spec -> System.out.printf("spec: desired=%d components=%s\n",
-//                        spec.desired, Arrays.toString(spec.components)))
+        return parseSpecs(Util.loadFile(path))
                 .filter(spec -> dfs(spec, 1, spec.components[0]))
                 .mapToLong(spec -> spec.desired)
                 .sum();
     }
 
+    static Stream<Spec> parseSpecs(List<String> input) {
+        return input.parallelStream()
+                .map(s -> s.split(" "))
+                .map(xs -> {
+                    var desiredStr = xs[0].substring(0, xs[0].length() - 1);
+                    var components = Arrays.stream(xs).skip(1).mapToLong(Long::parseLong).toArray();
+                    return new Spec(Long.parseLong(desiredStr), components);
+                });
+    }
+
     static boolean dfs(Spec spec, int currIndex, long currValue) {
-//        System.out.printf("spec.desired=%d, currIndex=%d, currValue=%d\n", spec.desired, currIndex, currValue);
         if (currIndex == spec.components.length) {
             return spec.desired == currValue;
         }
@@ -51,16 +52,7 @@ public class Day07 {
     }
 
     static long part2(String path) {
-        return Util.loadFile(path)
-                .parallelStream()
-                .map(s -> s.split(" "))
-                .map(xs -> {
-                    var desiredStr = xs[0].substring(0, xs[0].length() - 1);
-                    var components = Arrays.stream(xs).skip(1).mapToLong(Long::parseLong).toArray();
-                    return new Spec(Long.parseLong(desiredStr), components);
-                })
-//                .peek(spec -> System.out.printf("spec: desired=%d components=%s\n",
-//                        spec.desired, Arrays.toString(spec.components)))
+        return parseSpecs(Util.loadFile(path))
                 .filter(spec -> dfs2(spec, 1, spec.components[0]))
                 .mapToLong(spec -> spec.desired)
                 .sum();
