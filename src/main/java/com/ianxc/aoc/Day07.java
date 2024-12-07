@@ -30,8 +30,9 @@ public class Day07 {
             return false;
         }
 
-        return dfs(spec, currIndex + 1, currValue * spec.components[currIndex]) ||
-                dfs(spec, currIndex + 1, currValue + spec.components[currIndex]);
+        var currComponent = spec.components[currIndex];
+        return dfs(spec, currIndex + 1, currValue * currComponent) ||
+                dfs(spec, currIndex + 1, currValue + currComponent);
     }
 
     static boolean dfs2(Spec spec, int currIndex, long currValue) {
@@ -42,9 +43,10 @@ public class Day07 {
             return false;
         }
 
-        return dfs2(spec, currIndex + 1, currValue * spec.components[currIndex]) ||
-                dfs2(spec, currIndex + 1, currValue + spec.components[currIndex]) ||
-                dfs2(spec, currIndex + 1, currValue * nextPow10(spec.components[currIndex]) + spec.components[currIndex]);
+        var currComponent = spec.components[currIndex];
+        return dfs2(spec, currIndex + 1, currValue * currComponent) ||
+                dfs2(spec, currIndex + 1, currValue + currComponent) ||
+                dfs2(spec, currIndex + 1, currValue * nextPow10(currComponent) + currComponent);
     }
 
     static long nextPow10(long n) {
