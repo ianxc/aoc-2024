@@ -1,10 +1,16 @@
 package com.ianxc.aoc;
 
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
+import java.util.stream.IntStream;
 
 @SuppressWarnings("DuplicatedCode")
 public class Day06 {
+    private static final int[] OFFSET_UP = {-1, 0};
+    private static final int[] OFFSET_RIGHT = {0, 1};
+    private static final int[] OFFSET_DOWN = {1, 0};
+    private static final int[] OFFSET_LEFT = {0, -1};
+
     static int part1(String path) {
         var input = Util.loadFile(path);
         var grid = input.stream().map(String::toCharArray).toArray(char[][]::new);
@@ -75,38 +81,40 @@ public class Day06 {
 
     static int[] offsetOf(Direction dir) {
         return switch (dir) {
-            case UP -> new int[]{-1, 0};
-            case RIGHT -> new int[]{0, 1};
-            case DOWN -> new int[]{1, 0};
-            case LEFT -> new int[]{0, -1};
+            case UP -> OFFSET_UP;
+            case RIGHT -> OFFSET_RIGHT;
+            case DOWN -> OFFSET_DOWN;
+            case LEFT -> OFFSET_LEFT;
         };
     }
 
     static int part2(String path) {
         final var input = Util.loadFile(path);
-        var count = 0;
         var g = input.stream().map(String::toCharArray).toArray(char[][]::new);
         final var xMax = g.length;
         final var yMax = g[0].length;
-        for (int i = 0; i < xMax; i++) {
-            for (int j = 0; j < yMax; j++) {
-                if (g[i][j] == '.') {
-                    var ok = tryPosition(input, i, j);
-                    if (ok) count++;
-                }
-            }
-        }
-
-        return count;
+        final var guard = findGuard(g);
+        return (int)IntStream.range(0, xMax)
+                .parallel()
+                .mapToLong(i ->
+                        IntStream.range(0, yMax)
+                                .parallel()
+                                .filter(j -> g[i][j] == '.')
+                                .filter(j -> tryPosition(copy2d(g), i, j, guard.x, guard.y))
+                                .count()
+                ).sum();
     }
 
-    static boolean tryPosition(List<String> input, int i, int j) {
-        var grid = input.stream().map(String::toCharArray).toArray(char[][]::new);
-        var initial = findGuard(grid);
-        var x = initial.x;
-        var y = initial.y;
-        grid[i][j] = '#';
+    static char[][] copy2d(char[][] grid) {
+        var output = new char[grid.length][];
+        for (int i = 0; i < grid.length; i++) {
+            output[i] = Arrays.copyOf(grid[i], grid[i].length);
+        }
+        return output;
+    }
 
+    static boolean tryPosition(char[][] grid, int i, int j, int x, int y) {
+        grid[i][j] = '#';
         final var xMax = grid.length;
         final var yMax = grid[0].length;
         var visited = new HashSet<VisitedCoord>();
@@ -115,14 +123,10 @@ public class Day06 {
         while (x >= 0 && x < xMax && y >= 0 && y < yMax) {
             grid[x][y] = 'X';
             var coord = new VisitedCoord(x, y, currDir);
-            if (visited.contains(coord))  {
-//                System.out.println("----------------------");
-//                grid[x][y] = '-';
-//                grid[i][j] = 'O';
-//                System.out.println(gridToStr(grid));
+            var isNew = visited.add(coord);
+            if (!isNew) {
                 return true;
             }
-            visited.add(coord);
             var nextX = x + offset[0];
             var nextY = y + offset[1];
             if (!(nextX >= 0 && nextX < xMax)) break;
