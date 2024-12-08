@@ -18,4 +18,18 @@ class Day08Test {
 
         assertEquals(396, res);
     }
+
+    @Test
+    void testPart2Demo() {
+        var res = Day08.part2("day08/demo.txt");
+
+        assertEquals(34, res);
+    }
+
+    @Test
+    void testPart2() {
+        var res = Day08.part2("day08/input.txt");
+
+        assertEquals(1200, res);
+    }
 }
