@@ -77,18 +77,18 @@ public class Day09 {
             regions[i] = Region.newFree(input[i]);
         }
 
-        var minUnfilledRegion = 1;
-        for (int blockToMoveIdx = input.length - 1; blockToMoveIdx > minUnfilledRegion; blockToMoveIdx -= 2) {
-            for (int unfilledRegion = 1; unfilledRegion < blockToMoveIdx; unfilledRegion += 2) {
-                var freeSpace = regions[unfilledRegion].getFree();
-                if (freeSpace == 0 && unfilledRegion == minUnfilledRegion) {
+        var minUnfilledRegionIdx = 1;
+        for (int blockToMoveIdx = input.length - 1; blockToMoveIdx > minUnfilledRegionIdx; blockToMoveIdx -= 2) {
+            for (int unfilledRegionIdx = 1; unfilledRegionIdx < blockToMoveIdx; unfilledRegionIdx += 2) {
+                var freeSpace = regions[unfilledRegionIdx].getFree();
+                if (freeSpace == 0 && unfilledRegionIdx == minUnfilledRegionIdx) {
                     // optimization
-                    minUnfilledRegion += 2;
+                    minUnfilledRegionIdx += 2;
                     continue;
                 }
                 var blockToMoveCapacity = regions[blockToMoveIdx].capacity;
                 if (freeSpace >= blockToMoveCapacity) {
-                    regions[unfilledRegion].addBlock(regions[blockToMoveIdx].getSingle());
+                    regions[unfilledRegionIdx].addBlock(regions[blockToMoveIdx].getSingle());
                     regions[blockToMoveIdx] = Region.newFree(blockToMoveCapacity);
                     break;
                 }
