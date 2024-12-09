@@ -1,0 +1,42 @@
+package com.ianxc.aoc;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class Day09Test {
+    @Test
+    void testPart1Demo() {
+        var res = Day09.part1("day09/demo.txt");
+
+        assertEquals(1928, res);
+    }
+
+    @Test
+    void testPart1Demo2() {
+        var res = Day09.part1("day09/demo2.txt");
+
+        assertEquals(60, res);
+    }
+
+    @Test
+    void testPart1() {
+        var res = Day09.part1("day09/input.txt");
+
+        assertEquals(6331212425418L, res);
+    }
+
+    @Test
+    void testPart2Demo() {
+        var res = Day09.part2("day09/demo.txt");
+
+        assertEquals(34, res);
+    }
+
+    @Test
+    void testPart2() {
+        var res = Day09.part2("day09/input.txt");
+
+        assertEquals(1200, res);
+    }
+}
