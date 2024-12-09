@@ -1,5 +1,8 @@
 package com.ianxc.aoc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Day09 {
     private static final boolean DBG = false;
 
@@ -65,8 +68,93 @@ public class Day09 {
     }
 
     static long part2(String path) {
-        return 0;
+        var input = parseInput(path);
+        var regions = new Region[input.length];
+        for (int i = 0, fileId = 0; i < input.length; i += 2, fileId++) {
+            regions[i] = Region.newFull(fileId, input[i]);
+        }
+        for (int i = 1; i < input.length; i += 2) {
+            regions[i] = Region.newFree(input[i]);
+        }
+
+        var minUnfilledRegion = 1;
+        for (int blockToMoveIdx = input.length - 1; blockToMoveIdx > minUnfilledRegion; blockToMoveIdx -= 2) {
+            for (int unfilledRegion = 1; unfilledRegion < blockToMoveIdx; unfilledRegion += 2) {
+                var freeSpace = regions[unfilledRegion].getFree();
+                if (freeSpace == 0 && unfilledRegion == minUnfilledRegion) {
+                    // optimization
+                    minUnfilledRegion += 2;
+                    continue;
+                }
+                var blockToMoveCapacity = regions[blockToMoveIdx].capacity;
+                if (freeSpace >= blockToMoveCapacity) {
+                    regions[unfilledRegion].addBlock(regions[blockToMoveIdx].getSingle());
+                    regions[blockToMoveIdx] = Region.newFree(blockToMoveCapacity);
+                    break;
+                }
+            }
+        }
+
+        var checksum = 0L;
+        var checksumPosition = 0;
+        for (var r: regions) {
+            for (var b: r.getBlocks()) {
+                for (int i = 0; i < b.count; i++) {
+                    checksum += checksumPosition * b.fileId;
+                    checksumPosition++;
+                }
+            }
+            checksumPosition += r.getFree();
+        }
+
+        return checksum;
+
     }
 
+    record Block(long fileId, int count) {
+    }
+
+    static class Region {
+        final int capacity;
+        private final List<Block> blocks;
+        private int free;
+
+        private Region(int capacity, List<Block> blocks) {
+            this.capacity = capacity;
+            this.blocks = blocks;
+            this.free = capacity - blocks.stream().mapToInt(Block::count).sum();
+            if (this.free < 0) {
+                throw new IllegalArgumentException("capacity too small");
+            }
+        }
+
+        static Region newFree(int capacity) {
+            return new Region(capacity, new ArrayList<>());
+        }
+
+        static Region newFull(int fileId, int count) {
+            return new Region(count, List.of(new Block(fileId, count)));
+        }
+
+        int getFree() {
+            return free;
+        }
+
+        Block getSingle() {
+            return this.blocks.get(0);
+        }
+
+        void addBlock(Block block) {
+            this.blocks.add(block);
+            this.free -= block.count;
+            if (this.free < 0) {
+                throw new IllegalArgumentException("free should not become negative");
+            }
+        }
+
+        List<Block> getBlocks() {
+            return this.blocks;
+        }
+    }
 
 }
