@@ -49,14 +49,9 @@ public class Day09 {
     }
 
     static int[] parseInput(String path) {
-        var inputStr = Util.loadFile(path).get(0);
-        var chars = inputStr.toCharArray();
-        var n = chars.length;
-        var nums = new int[n];
-        for (int i = 0; i < n; i++) {
-            nums[i] = chars[i] - '0';
-        }
-        return nums;
+        return Util.loadFile(path).get(0).chars()
+                .map(i -> i - '0')
+                .toArray();
     }
 
     static long rightFileIdOf(int[] nums) {
@@ -156,5 +151,4 @@ public class Day09 {
             return this.blocks;
         }
     }
-
 }
