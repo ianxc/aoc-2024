@@ -30,13 +30,13 @@ class Day09Test {
     void testPart2Demo() {
         var res = Day09.part2("day09/demo.txt");
 
-        assertEquals(34, res);
+        assertEquals(2858, res);
     }
 
     @Test
     void testPart2() {
         var res = Day09.part2("day09/input.txt");
 
-        assertEquals(1200, res);
+        assertEquals(6363268339304L, res);
     }
 }
