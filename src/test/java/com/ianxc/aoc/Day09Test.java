@@ -9,14 +9,14 @@ class Day09Test {
     void testPart1Demo() {
         var res = Day09.part1("day09/demo.txt");
 
-        assertEquals(1928, res);
+        assertEquals(1928L, res);
     }
 
     @Test
     void testPart1Demo2() {
         var res = Day09.part1("day09/demo2.txt");
 
-        assertEquals(60, res);
+        assertEquals(60L, res);
     }
 
     @Test
@@ -30,7 +30,7 @@ class Day09Test {
     void testPart2Demo() {
         var res = Day09.part2("day09/demo.txt");
 
-        assertEquals(2858, res);
+        assertEquals(2858L, res);
     }
 
     @Test
