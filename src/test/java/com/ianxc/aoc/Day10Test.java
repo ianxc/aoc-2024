@@ -27,17 +27,23 @@ class Day10Test {
         assertEquals(744, res);
     }
 
-    @Test
-    void testPart2Demo() {
-        var res = Day10.part2("day10/demo.txt");
+    @ParameterizedTest
+    @CsvSource({
+            "day10/demo5.txt,   3",
+            "day10/demo2.txt,  13",
+            "day10/demo6.txt, 227",
+            "day10/demo4.txt,  81"
+    })
+    void testPart2Demo(String path, int expectedSumRatings) {
+        var res = Day10.part2(path);
 
-        assertEquals(2858L, res);
+        assertEquals(expectedSumRatings, res);
     }
 
     @Test
     void testPart2() {
         var res = Day10.part2("day10/input.txt");
 
-        assertEquals(6363268339304L, res);
+        assertEquals(1651, res);
     }
 }
