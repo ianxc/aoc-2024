@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@SuppressWarnings("DuplicatedCode")
 public class Day10 {
     static final int[][] offsets = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
 
