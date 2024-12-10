@@ -12,7 +12,6 @@ public class Day10 {
     static int part1(String path) {
         var grid = parseGrid(path);
         var totalScore = 0;
-        var memo = new HashMap<Point, Integer>();
         var height = grid.length;
         var width = grid[0].length;
         for (int i = 0; i < height; i++) {
@@ -20,7 +19,7 @@ public class Day10 {
                 if (grid[i][j] == 0) {
                     // reset visited for each trailhead we start from
                     var visited = new HashSet<Point>();
-                    final var trailheadScore = dfs(memo, visited, i, j, 0, grid);
+                    final var trailheadScore = dfs(visited, i, j, 0, grid);
                     totalScore += trailheadScore;
                 }
             }
@@ -28,21 +27,14 @@ public class Day10 {
         return totalScore;
     }
 
-    static int dfs(Map<Point, Integer> memo, Set<Point> visited, int i, int j, int currentValue, int[][] grid) {
-        System.out.printf("enter      i=%d, j=%d, cv=%d, memo=%s\n", i, j, currentValue, memo);
+    static int dfs(Set<Point> visited, int i, int j, int currentValue, int[][] grid) {
+        System.out.printf("enter      i=%d, j=%d, cv=%d\n", i, j, currentValue);
         var currPoint = new Point(i, j);
         if (!visited.add(currPoint)) {
             return 0;
         }
 
-        var countOrNull = memo.get(currPoint);
-        if (countOrNull != null) {
-            System.out.printf("exit  MEMO countOrNull=%d\n", countOrNull);
-            return countOrNull;
-        }
-
         if (currentValue == 9) {
-//            memo.put(currPoint, 1);
             System.out.printf("exit  DONE i=%d, j=%d\n", i, j);
             return 1;
         }
@@ -54,11 +46,9 @@ public class Day10 {
             var newI = i + offset[0];
             var newJ = j + offset[1];
             if (newI >= 0 && newI < height && newJ >= 0 && newJ < width && grid[newI][newJ] == currentValue + 1) {
-                currPointScore += dfs(memo, visited, newI, newJ, currentValue + 1, grid);
+                currPointScore += dfs(visited, newI, newJ, currentValue + 1, grid);
             }
         }
-// buggy because we may not visit in a consistent order perhaps?
-//        memo.put(currPoint, currPointScore);
         System.out.printf("exit  PUT  i=%d, j=%d, cv=%d, currentPointScore=%d\n", i, j, currentValue, currPointScore);
         return currPointScore;
     }
