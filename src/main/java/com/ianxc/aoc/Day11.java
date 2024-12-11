@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.LongStream;
 
-@SuppressWarnings("DuplicatedCode")
 public class Day11 {
     static long part1(String path, int iterations) {
         var result = parseInput(path).parallel();
