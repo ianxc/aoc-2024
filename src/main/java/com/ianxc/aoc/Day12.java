@@ -120,11 +120,11 @@ public class Day12 {
                 if (curr.i != newI) {
                     // changed i
                     fenceV.computeIfAbsent(new SingleAxisPair(curr.i, newI), k -> new ArrayList<>())
-                            .add(j);
+                            .add(curr.j);
                 } else {
                     // changed j
                     fenceH.computeIfAbsent(new SingleAxisPair(curr.j, newJ), k -> new ArrayList<>())
-                            .add(i);
+                            .add(curr.i);
                 }
             }
         }
