@@ -41,15 +41,14 @@ public class Day12 {
             for (final var offset : offsets) {
                 final var newI = curr.i + offset[0];
                 final var newJ = curr.j + offset[1];
+                final var inBounds = newI >= 0 && newI < height && newJ >= 0 && newJ < width;
                 // Count grid boundaries and different characters as perimeter
-                if (newI < 0 || newI >= height || newJ < 0 || newJ >= width ||
-                        (grid[newI][newJ] != currChar && grid[newI][newJ] != visitedChar)) {  // Removed the VISITED_MARKER check
+                if (!inBounds || (grid[newI][newJ] != currChar && grid[newI][newJ] != visitedChar)) {  // Removed the VISITED_MARKER check
                     // System.out.printf("i=%d j=%d offset=(%d, %d)\n", curr.i, curr.j, offset[0], offset[1]);
                     perimeter++;
                 }
                 // Add unvisited neighbors of same character to queue
-                if (newI >= 0 && newI < height && newJ >= 0 && newJ < width &&
-                        grid[newI][newJ] == currChar && grid[newI][newJ] != visitedChar) {
+                if (inBounds && grid[newI][newJ] == currChar && grid[newI][newJ] != visitedChar) {
                     grid[newI][newJ] = visitedChar;
                     queue.offer(new Point(newI, newJ));
                 }
