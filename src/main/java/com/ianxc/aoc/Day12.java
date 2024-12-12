@@ -37,18 +37,18 @@ public class Day12 {
         while (!queue.isEmpty()) {
             final var curr = queue.poll();
             // record statistics and mark as visited
-            var perimeterContribution = 4L;
+            var perimeterContribution = 0L;
             for (final var offset : offsets) {
                 final var newI = curr.i + offset[0];
                 final var newJ = curr.j + offset[1];
-                if (newI >= 0 && newI < height && newJ >= 0 && newJ < width) {
-                    if (grid[newI][newJ] == currChar) {
-                        perimeterContribution--;
-                        if (grid[newI][newJ] != VISITED_MARKER) {
-                            grid[newI][newJ] = VISITED_MARKER;
-                            queue.offer(new Point(newI, newJ));
-                        }
+                var inGridAndSameChar = newI >= 0 && newI < height && newJ >= 0 && newJ < width && grid[newI][newJ] == currChar;
+                if (inGridAndSameChar) {
+                    if (grid[newI][newJ] != VISITED_MARKER) {
+                        grid[newI][newJ] = VISITED_MARKER;
+                        queue.offer(new Point(newI, newJ));
                     }
+                } else {
+                    perimeterContribution++;
                 }
             }
             area++;
