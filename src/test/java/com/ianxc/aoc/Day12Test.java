@@ -26,7 +26,7 @@ class Day12Test {
             "day12/demo4.txt, 236",
             "day12/demo5.txt, 368",
             "day12/demo3.txt, 1206",
-            "day12/input.txt, 1"
+            "day12/input.txt, 821372"
     })
     void testPart2(String path, long expectedSol) {
         var res = Day12.part2(path);
