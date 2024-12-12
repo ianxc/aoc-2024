@@ -1,14 +1,11 @@
 package com.ianxc.aoc;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Stream;
 
 public class Day12 {
     private static final int[][] offsets = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+    private static final int[][] hOffsets = {{1, 0}, {-1, 0}};
+    private static final int[][] wOffsets = {{0, 1}, {0, -1}};
 
     static long part1(String path) {
         final var grid = parseInput(path);
@@ -93,57 +90,61 @@ public class Day12 {
         final var width = grid[0].length;
         final var currChar = grid[i][j];
         var area = 0L;
+        var corners = 0L;
 
-        final var stack = new ArrayDeque<Point>();
-        stack.push(new Point(i, j));
+        final var queue = new ArrayDeque<Point>();
         visited[i][j] = true;
-        // Store horizontally-spanning points (j), indexed by a 2x1 vertical block
-        var fenceV = new HashMap<SingleAxisPair, List<Integer>>();
-        // Store vertically-spanning points (i), indexed by a 1x2 horizontal block
-        var fenceH = new HashMap<SingleAxisPair, List<Integer>>();
+        queue.offer(new Point(i, j));
 
-        while (!stack.isEmpty()) {
-            final var curr = stack.pop();
+        while (!queue.isEmpty()) {
+            final var curr = queue.poll();
             area++;
+
+            var numHOffsets = numOffsets(hOffsets, grid, currChar, curr.i, curr.j);
+            var numWOffsets = numOffsets(wOffsets, grid, currChar, curr.i, curr.j);
+            if (numHOffsets == 0 && numWOffsets == 0) {
+                // Single point *
+                if (!queue.isEmpty()) throw new IllegalStateException("queue should be empty if no adjacent offsets");
+                corners += 4;
+            } else if (numHOffsets == 1 && numWOffsets == 1) {
+                // L-shape
+                // * -
+                // |
+                corners += 1;
+            } else if (numHOffsets == 1 || numWOffsets == 1) {
+                // Endpoint -*
+                corners += 2;
+            }
+
             for (final var offset : offsets) {
                 final var newI = curr.i + offset[0];
                 final var newJ = curr.j + offset[1];
-                if (newI >= 0 && newJ >= 0) {
-                    if (newI < height && newJ < width && grid[newI][newJ] == currChar) {
-                        if (!visited[newI][newJ]) {
-                            visited[newI][newJ] = true;
-                            stack.push(new Point(newI, newJ));
-                        }
-                        continue;
-                    }
-                }
-                if (curr.i != newI) {
-                    // changed i
-                    fenceV.computeIfAbsent(new SingleAxisPair(curr.i, newI), k -> new ArrayList<>())
-                            .add(curr.j);
-                } else {
-                    // changed j
-                    fenceH.computeIfAbsent(new SingleAxisPair(curr.j, newJ), k -> new ArrayList<>())
-                            .add(curr.i);
+                final var inBounds = newI >= 0 && newI < height && newJ >= 0 && newJ < width;
+                if (inBounds && grid[newI][newJ] == currChar && !visited[newI][newJ]) {
+                    visited[newI][newJ] = true;
+                    queue.offer(new Point(newI, newJ));
                 }
             }
+
+
         }
 
-        var sides = Stream.concat(fenceV.values().stream(), fenceH.values().stream())
-                .mapToLong(spanningPoints -> {
-                    Collections.sort(spanningPoints);
-                    var fence = 1;
-                    for (int idx = 1; idx < spanningPoints.size(); idx++) {
-                        if (spanningPoints.get(idx) - spanningPoints.get(idx - 1) != 1) {
-                            fence += 1;
-                        }
-                    }
-                    return fence;
-                })
-                .sum();
+        return new ExploredRegion(currChar, area, corners);
+    }
 
-
-        return new ExploredRegion(currChar, area, sides);
+    static int numOffsets(int[][] offsets, char[][] grid, char currChar, int i, int j) {
+        final var height = grid.length;
+        final var width = grid[0].length;
+        var numOffsets = 0;
+        for (final var offset : offsets) {
+            final var newI = i + offset[0];
+            final var newJ = j + offset[1];
+            final var inBounds = newI >= 0 && newI < height && newJ >= 0 && newJ < width;
+            if (inBounds && grid[newI][newJ] == currChar) {
+                numOffsets++;
+            }
+        }
+        return numOffsets;
     }
 
     record ExploredRegion(char ch, long area, long perimeter) {
