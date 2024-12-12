@@ -4,8 +4,6 @@ import java.util.ArrayDeque;
 
 public class Day12 {
     private static final int[][] offsets = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-    private static final int[][] hOffsets = {{1, 0}, {-1, 0}};
-    private static final int[][] wOffsets = {{0, 1}, {0, -1}};
 
     static long part1(String path) {
         final var grid = parseInput(path);
@@ -85,6 +83,7 @@ public class Day12 {
         return totalPrice;
     }
 
+    @SuppressWarnings("DuplicatedCode")
     static ExploredRegion exploreRegionSides(char[][] grid, int i, int j, boolean[][] visited) {
         final var height = grid.length;
         final var width = grid[0].length;
@@ -100,20 +99,24 @@ public class Day12 {
             final var curr = queue.poll();
             area++;
 
-            var numHOffsets = numOffsets(hOffsets, grid, currChar, curr.i, curr.j);
-            var numWOffsets = numOffsets(wOffsets, grid, currChar, curr.i, curr.j);
-            if (numHOffsets == 0 && numWOffsets == 0) {
-                // Single point *
-                if (!queue.isEmpty()) throw new IllegalStateException("queue should be empty if no adjacent offsets");
-                corners += 4;
-            } else if (numHOffsets == 1 && numWOffsets == 1) {
-                // L-shape
-                // * -
-                // |
-                corners += 1;
-            } else if (numHOffsets == 1 || numWOffsets == 1) {
-                // Endpoint -*
-                corners += 2;
+            for (int idx = 0; idx < offsets.length; idx++) {
+                final var o1 = offsets[idx];
+                final var c1i = curr.i + o1[0];
+                final var c1j = curr.j + o1[1];
+                final var c1Match = c1i >= 0 && c1i < height && c1j >= 0 && c1j < width && grid[c1i][c1j] == currChar;
+
+                final var o2 = offsets[(idx + 1) % offsets.length];
+                final var c2i = curr.i + o2[0];
+                final var c2j = curr.j + o2[1];
+                final var c2Match = c2i >= 0 && c2i < height && c2j >= 0 && c2j < width && grid[c2i][c2j] == currChar;
+
+                final var cornerI = curr.i + o1[0] + o2[0];
+                final var cornerJ = curr.j + o1[1] + o2[1];
+                final var cornerMatch = cornerI >= 0 && cornerI < height && cornerJ >= 0 && cornerJ < width && grid[cornerI][cornerJ] == currChar;
+
+                final var isExternalCorner = !c1Match && !c2Match;
+                final var isInternalCorner = c1Match && c2Match && !cornerMatch;
+                if (isExternalCorner || isInternalCorner) corners++;
             }
 
             for (final var offset : offsets) {
@@ -125,34 +128,14 @@ public class Day12 {
                     queue.offer(new Point(newI, newJ));
                 }
             }
-
-
         }
 
         return new ExploredRegion(currChar, area, corners);
-    }
-
-    static int numOffsets(int[][] offsets, char[][] grid, char currChar, int i, int j) {
-        final var height = grid.length;
-        final var width = grid[0].length;
-        var numOffsets = 0;
-        for (final var offset : offsets) {
-            final var newI = i + offset[0];
-            final var newJ = j + offset[1];
-            final var inBounds = newI >= 0 && newI < height && newJ >= 0 && newJ < width;
-            if (inBounds && grid[newI][newJ] == currChar) {
-                numOffsets++;
-            }
-        }
-        return numOffsets;
     }
 
     record ExploredRegion(char ch, long area, long perimeter) {
     }
 
     record Point(int i, int j) {
-    }
-
-    record SingleAxisPair(int x, int newX) {
     }
 }
