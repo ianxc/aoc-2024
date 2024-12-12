@@ -18,4 +18,19 @@ class Day12Test {
 
         assertEquals(expectedSol, res);
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "day12/demo.txt, 80",
+            "day12/demo2.txt, 436",
+            "day12/demo4.txt, 236",
+            "day12/demo5.txt, 368",
+            "day12/demo3.txt, 1206",
+            "day12/input.txt, 1"
+    })
+    void testPart2(String path, long expectedSol) {
+        var res = Day12.part2(path);
+
+        assertEquals(expectedSol, res);
+    }
 }
