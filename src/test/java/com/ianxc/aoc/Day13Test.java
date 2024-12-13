@@ -10,7 +10,7 @@ class Day13Test {
     @ParameterizedTest
     @CsvSource({
             "day13/demo.txt, 480",
-            "day13/input.txt, 0"
+            "day13/input.txt, 40369"
     })
     void testPart1(String path, long expectedMinTokens) {
         var res = Day13.part1(path);
