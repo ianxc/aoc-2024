@@ -88,7 +88,7 @@ public class Day13 {
         var input = Util.loadFile(path);
         var scenarios = getScenarios(input, 10000000000000L);
         return scenarios.stream()
-                .flatMapToLong(s -> solveEquationsAndComputeCost(s).stream().mapToLong(Long::longValue))
+                .mapToLong(s -> solveEquationsAndComputeCost(s).orElse(0L))
                 .sum();
     }
 
