@@ -18,4 +18,15 @@ class Day13Test {
         assertEquals(expectedMinTokens, res);
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "day13/demo.txt, 0",
+            "day13/input.txt, 0"
+    })
+    void testPart2(String path, long expectedMinTokens) {
+        var res = Day13.part2(path);
+
+        assertEquals(expectedMinTokens, res);
+    }
+
 }
