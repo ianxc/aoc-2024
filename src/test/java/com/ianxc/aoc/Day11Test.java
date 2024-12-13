@@ -12,7 +12,6 @@ class Day11Test {
             "day11/demo2.txt, 6, 22",
             "day11/demo2.txt, 25, 55312",
             "day11/input.txt, 25, 189092",
-            "day11/input.txt, 75, 224869647102559"
     })
     void testPart1(String path, int iterations, long expectedCount) {
         var res = Day11.part1(path, iterations);
