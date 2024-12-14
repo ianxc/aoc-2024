@@ -10,21 +10,25 @@ public class Day14 {
     // height = tall = y
     // width = wide = x
     static long part1(String path, int height, int width, int iterations) {
-        var robotStream = Util.loadFile(path).stream().map(Day14::parseRow);
-        robotStream = robotStream.peek(System.out::println);
+        var robots = Util.loadFile(path).stream()
+                .map(Day14::parseRow)
+                .peek(System.out::println)
+                .toList();
         for (int i = 0; i < iterations; i++) {
-            robotStream = robotStream.map(r -> runStep(r, height, width));
+            for (var r: robots) {
+                runStep(r, height, width);
+            }
         }
 
         var centerHeight = height / 2;
         var centerWidth = width / 2;
         final var quadrants = new long[4];
-        robotStream.forEach(r -> {
+        for (var r : robots) {
             if (r.x < centerWidth && r.y < centerHeight) quadrants[0]++;
             else if (r.x < centerWidth && r.y > centerHeight) quadrants[1]++;
             else if (r.x > centerWidth && r.y < centerHeight) quadrants[2]++;
             else if (r.x > centerWidth && r.y > centerHeight) quadrants[3]++;
-        });
+        }
 
         System.out.println(Arrays.toString(quadrants));
         return quadrants[0] * quadrants[1] * quadrants[2] * quadrants[3];
