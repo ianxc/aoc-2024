@@ -61,7 +61,6 @@ public class Day14 {
     static long part2(String path, int height, int width, int maxIterations) {
         var robots = parseRobots(path).toList();
         for (int i = 1; i <= maxIterations; i++) {
-            System.out.println("i: " + i);
             for (var r : robots) {
                 runStep(r, height, width);
             }
