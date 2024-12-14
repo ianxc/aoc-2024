@@ -26,4 +26,11 @@ class Day14Test {
         assertEquals(0L, res);
     }
 
+    @Test
+    void testPart2() {
+        var res = Day14.part2("day14/input.txt", 103, 101, 100_000);
+
+        assertEquals(7603L, res);
+    }
+
 }
