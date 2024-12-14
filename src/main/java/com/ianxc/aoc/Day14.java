@@ -6,13 +6,12 @@ import java.util.regex.Pattern;
 public class Day14 {
     static final Pattern rowPattern = Pattern.compile("p=(\\d+),(\\d+) v=(-?\\d+),(-?\\d+)");
 
-
     // height = tall = y
     // width = wide = x
     static long part1(String path, int height, int width, int iterations) {
         var robots = Util.loadFile(path).stream()
                 .map(Day14::parseRow)
-                .peek(System.out::println)
+                //.peek(System.out::println)
                 .toList();
         for (int i = 0; i < iterations; i++) {
             for (var r: robots) {
@@ -45,10 +44,12 @@ public class Day14 {
                 Integer.parseInt(m.group(4)));
     }
 
-    static Robot runStep(Robot r, int height, int width) {
-        r.x = (r.x + r.dx) % width;
-        r.y = (r.y + r.dy) % height;
-        return r;
+    static void runStep(Robot r, int height, int width) {
+        // Do not use %!!
+        // https://stackoverflow.com/questions/5385024/mod-in-java-produces-negative-numbers
+        r.x = Math.floorMod(r.x + r.dx, width) ;
+        r.y = Math.floorMod(r.y + r.dy, height);
+        // System.out.println(r);
     }
 
     static final class Robot {
