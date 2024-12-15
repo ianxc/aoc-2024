@@ -7,28 +7,82 @@ public class Day15 {
         var input = Util.loadFile(path);
         var bi = findBlankIndex(input);
         var grid = parseGrid(input, bi);
+        final var height = grid.length;
+        final var width = grid[0].length;
         var steps = parseSteps(input, bi);
         var robot = findRobot(grid);
 
-        for (final var step: steps) {
+        for (final var step : steps) {
             switch (step) {
                 case '^' -> {
-                    System.out.println("up");
+                    for (int i = robot.i - 1; i >= 0; i--) {
+                        if (grid[i][robot.j] == '#') break;
+                        if (grid[i][robot.j] == '.') {
+                            for (int i2 = i; i2 < robot.i; i2++) {
+                                grid[i2][robot.j] = grid[i2 + 1][robot.j];
+                            }
+                            grid[robot.i][robot.j] = '.';
+                            robot.i--;
+                            break;
+                        }
+                    }
                 }
                 case '>' -> {
-                    System.out.println("right");
+                    for (int j = robot.j + 1; j < width; j++) {
+                        if (grid[robot.i][j] == '#') break;
+                        if (grid[robot.i][j] == '.') {
+                            for (int j2 = j; j2 > robot.j; j2--) {
+                                grid[robot.i][j2] = grid[robot.i][j2 - 1];
+                            }
+                            grid[robot.i][robot.j] = '.';
+                            robot.j++;
+                            break;
+                        }
+                    }
                 }
                 case 'v' -> {
-                    System.out.println("down");
+                    for (int i = robot.i + 1; i < height; i++) {
+                        if (grid[i][robot.j] == '#') break;
+                        if (grid[i][robot.j] == '.') {
+                            for (int i2 = i; i2 > robot.i; i2--) {
+                                grid[i2][robot.j] = grid[i2 - 1][robot.j];
+                            }
+                            grid[robot.i][robot.j] = '.';
+                            robot.i++;
+                            break;
+                        }
+                    }
                 }
                 case '<' -> {
-                    System.out.println("left");
+                    for (int j = robot.j - 1; j >= 0; j--) {
+                        if (grid[robot.i][j] == '#') break;
+                        if (grid[robot.i][j] == '.') {
+                            for (int j2 = j; j2 < robot.j; j2++) {
+                                grid[robot.i][j2] = grid[robot.i][j2 + 1];
+                            }
+                            grid[robot.i][robot.j] = '.';
+                            robot.j--;
+                            break;
+                        }
+                    }
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + step);
             }
         }
 
-        return 0;
+        return computeGpsSum(grid);
+    }
+
+    private static long computeGpsSum(char[][] grid) {
+        var gpsSum = 0L;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] == 'O') {
+                    gpsSum += 100L * i + j;
+                }
+            }
+        }
+        return gpsSum;
     }
 
     private static char[][] parseGrid(List<String> input, int bi) {
