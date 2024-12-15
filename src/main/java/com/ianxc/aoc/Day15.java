@@ -66,23 +66,11 @@ public class Day15 {
                         }
                     }
                 }
-                default -> throw new IllegalStateException("Unexpected value: " + step);
+                default -> throw new IllegalStateException("Unexpected step: " + step);
             }
         }
 
         return computeGpsSum(grid);
-    }
-
-    private static long computeGpsSum(char[][] grid) {
-        var gpsSum = 0L;
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[0].length; j++) {
-                if (grid[i][j] == 'O') {
-                    gpsSum += 100L * i + j;
-                }
-            }
-        }
-        return gpsSum;
     }
 
     private static char[][] parseGrid(List<String> input, int bi) {
@@ -113,6 +101,18 @@ public class Day15 {
             }
         }
         throw new IllegalArgumentException("grid should contain robot");
+    }
+
+    static long computeGpsSum(char[][] grid) {
+        var gpsSum = 0L;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] == 'O') {
+                    gpsSum += 100L * i + j;
+                }
+            }
+        }
+        return gpsSum;
     }
 
     static class Point {
