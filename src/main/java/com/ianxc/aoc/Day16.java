@@ -33,7 +33,8 @@ public class Day16 {
             for (var newDir : curr.direction.nextDirs()) {
                 var newI = curr.i + newDir.di;
                 var newJ = curr.j + newDir.dj;
-                if (grid[newI][newJ] == '.') {
+                // Lol, just had to check for E
+                if (grid[newI][newJ] == '.' || grid[newI][newJ] == 'E') {
                     final var newCost = costToReach[curr.i][curr.j][curr.direction.ordinal()] + 1 + (newDir == curr.direction ? 0 : 1000);
                     if (newCost < costToReach[newI][newJ][newDir.ordinal()]) {
                         costToReach[newI][newJ][newDir.ordinal()] = newCost;
