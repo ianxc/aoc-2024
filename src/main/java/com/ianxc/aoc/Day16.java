@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
+@SuppressWarnings("DuplicatedCode")
 public class Day16 {
     public static final long UNSEEN_VAL = Long.MAX_VALUE / 2;
 
@@ -16,6 +17,7 @@ public class Day16 {
         final var width = grid[0].length;
 
         // Initialise costs to visit
+        // No need for 3d array where 3rd dimension is direction in this case.
         var costToReach = new long[height][width];
         fill2d(costToReach, UNSEEN_VAL);
 
@@ -62,6 +64,14 @@ public class Day16 {
         }
     }
 
+    static void fill3d(long[][][] grid, @SuppressWarnings("SameParameterValue") long value) {
+        for (var row : grid) {
+            for (var section : row) {
+                Arrays.fill(section, value);
+            }
+        }
+    }
+
     static void printPath(Point[][] cameFrom, int height, int width) {
         var currI = 1;
         var currJ = width - 2;
@@ -74,6 +84,65 @@ public class Day16 {
             count++;
         }
         System.out.printf("#%3d: i=%d, j=%d\n", count, currI, currJ);
+    }
+
+    static long part2(String path) {
+        // Parse
+        final var grid = parseGrid(path);
+        final var height = grid.length;
+        final var width = grid[0].length;
+
+        // Initialise costs to visit
+        var costToReach = new long[height][width][Direction.length];
+        fill3d(costToReach, UNSEEN_VAL);
+
+        // A 3d array to store if we have a min cost parent reaching this node.
+        // Note that the direction is *from* the (curr) to the (new), so backtracking will require
+        // *going in the opposite direction*.
+        var minCostParents = new boolean[height][width][Direction.length];
+
+        // A* search
+        final var cmp = Comparator.comparingLong(State::priorityCost);
+        final var frontier = new PriorityQueue<>(cmp);
+        frontier.offer(new State(height - 2, 1, Direction.EAST, 0));
+        costToReach[height - 2][1][Direction.EAST.ordinal()] = 0;
+        var minTargetCost = UNSEEN_VAL;
+
+        while (!frontier.isEmpty()) {
+            var curr = frontier.poll();
+            if (curr.i == 1 && curr.j == width - 2) {
+                if (minTargetCost < costToReach[curr.i][curr.j][curr.direction.ordinal()]) {
+                    // We must have found all minimum cost paths. Backtrack all parents of (curr.i, curr.j).
+                    // TEMP: check against part 1:
+                    return costToReach[curr.i][curr.j][curr.direction.ordinal()];
+                } else {
+                    // If first time (minTargetCost > 2^61), then set real min.
+                    // If equal, then no change.
+                    minTargetCost = costToReach[curr.i][curr.j][curr.direction.ordinal()];
+                    return costToReach[curr.i][curr.j][curr.direction.ordinal()];
+
+                }
+            }
+
+            for (var newDir : curr.direction.nextDirs()) {
+                var newI = curr.i + newDir.di;
+                var newJ = curr.j + newDir.dj;
+                // Lol, just had to check for E
+                if (grid[newI][newJ] == '.' || grid[newI][newJ] == 'E') {
+                    final var newCost = costToReach[curr.i][curr.j][curr.direction.ordinal()] + 1 + (newDir == curr.direction ? 0 : 1000);
+                    if (newCost < costToReach[newI][newJ][newDir.ordinal()]) {
+                        costToReach[newI][newJ][newDir.ordinal()] = newCost;
+                        // For min cost backtracking
+                        Arrays.fill(minCostParents[newI][newJ], false);
+                        minCostParents[newI][newJ][newDir.ordinal()] = true;
+                        final var newPriority = newCost + heuristic(newI, newJ, height, width);
+                        final var newState = new State(newI, newJ, newDir, newPriority);
+                        frontier.offer(newState);
+                    }
+                }
+            }
+        }
+        return -1;
     }
 
     enum Direction {
