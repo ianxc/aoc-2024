@@ -14,27 +14,27 @@ public class Day16 {
         final var width = grid[0].length;
 
         // Initialise costs to visit
-        var costToReach = new long[height][width][Direction.length];
-        fill3d(costToReach, Long.MAX_VALUE / 2);
+        var costToReach = new long[height][width];
+        fill2d(costToReach, Long.MAX_VALUE / 2);
 
         // A* search
         final var cmp = Comparator.comparingLong(State::priorityCost);
         final var frontier = new PriorityQueue<>(cmp);
         frontier.offer(new State(height - 2, 1, Direction.EAST, 0));
-        costToReach[height - 2][1][Direction.EAST.ordinal()] = 0;
+        costToReach[height - 2][1] = 0;
 
         while (!frontier.isEmpty()) {
             var curr = frontier.poll();
-            if (curr.i == 1 && curr.j == width - 2) return costToReach[curr.i][curr.j][curr.direction.ordinal()];
+            if (curr.i == 1 && curr.j == width - 2) return costToReach[curr.i][curr.j];
 
             for (var newDir : curr.direction.nextDirs()) {
                 var newI = curr.i + newDir.di;
                 var newJ = curr.j + newDir.dj;
                 // Lol, just had to check for E
                 if (grid[newI][newJ] == '.' || grid[newI][newJ] == 'E') {
-                    final var newCost = costToReach[curr.i][curr.j][curr.direction.ordinal()] + 1 + (newDir == curr.direction ? 0 : 1000);
-                    if (newCost < costToReach[newI][newJ][newDir.ordinal()]) {
-                        costToReach[newI][newJ][newDir.ordinal()] = newCost;
+                    final var newCost = costToReach[curr.i][curr.j] + 1 + (newDir == curr.direction ? 0 : 1000);
+                    if (newCost < costToReach[newI][newJ]) {
+                        costToReach[newI][newJ] = newCost;
                         final var newPriority = newCost + heuristic(newI, newJ, height, width);
                         final var newState = new State(newI, newJ, newDir, newPriority);
                         frontier.offer(newState);
@@ -54,11 +54,10 @@ public class Day16 {
         return Util.loadFile(path).stream().map(String::toCharArray).toArray(char[][]::new);
     }
 
-    static void fill3d(long[][][] grid, @SuppressWarnings("SameParameterValue") long value) {
+    static void fill2d(long[][] grid, @SuppressWarnings("SameParameterValue") long value) {
         for (var row : grid) {
-            for (var subsection : row) {
-                Arrays.fill(subsection, value);
-            }
+            Arrays.fill(row, value);
+
         }
     }
 
