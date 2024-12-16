@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 @SuppressWarnings("DuplicatedCode")
 public class Day16 {
@@ -113,8 +114,7 @@ public class Day16 {
             if (curr.i == 1 && curr.j == width - 2) {
                 if (minTargetCost < costToReach[curr.i][curr.j][curr.direction.ordinal()]) {
                     // We must have found all minimum cost paths. Backtrack all parents of (curr.i, curr.j).
-                    // TEMP: check against part 1:
-                    return costToReach[curr.i][curr.j][curr.direction.ordinal()];
+                    return getAllParents(minCostParents, curr.i, curr.j).size();
                 } else {
                     // If first time (minTargetCost > 2^61), then set real min.
                     // If equal, then no change.
@@ -130,10 +130,12 @@ public class Day16 {
                 // Lol, just had to check for E
                 if (grid[newI][newJ] == '.' || grid[newI][newJ] == 'E') {
                     final var newCost = costToReach[curr.i][curr.j][curr.direction.ordinal()] + 1 + (newDir == curr.direction ? 0 : 1000);
+                    // optimization: skip when we know we will exceed the min target cost
+                    if (newCost > minTargetCost) continue;
+
                     if (newCost < costToReach[newI][newJ][newDir.ordinal()]) {
                         costToReach[newI][newJ][newDir.ordinal()] = newCost;
                         // For min cost backtracking
-                        Arrays.fill(minCostParents[newI][newJ], false);
                         minCostParents[newI][newJ][newDir.ordinal()] = true;
                         final var newPriority = newCost + heuristic(newI, newJ, height, width);
                         final var newState = new State(newI, newJ, newDir, newPriority);
@@ -143,6 +145,10 @@ public class Day16 {
             }
         }
         return -1;
+    }
+
+    private static Set<Point> getAllParents(boolean[][][] minCostParents, int i, int j) {
+        return Set.of();
     }
 
     enum Direction {
@@ -182,7 +188,7 @@ public class Day16 {
 }
 
 /*
-Part 2 ideas:
+Part 2 ideas: (2d or 3d array?)
 1. instead of returning on the first time we reach the end, continue checking till we get a result more than the min.
 2. Either costToReach or cameFrom has multiple parents which we can backtrack.
 3. When newCost == existing costToReach value, still add it to the priority queue.
