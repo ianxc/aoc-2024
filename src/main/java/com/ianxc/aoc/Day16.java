@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 public class Day16 {
+    public static final long UNSEEN_VAL = Long.MAX_VALUE / 2;
+
     // A* search for fun.
     static long part1(String path) {
         // Parse
@@ -15,7 +17,7 @@ public class Day16 {
 
         // Initialise costs to visit
         var costToReach = new long[height][width];
-        fill2d(costToReach, Long.MAX_VALUE / 2);
+        fill2d(costToReach, UNSEEN_VAL);
 
         // A* search
         final var cmp = Comparator.comparingLong(State::priorityCost);
@@ -57,7 +59,6 @@ public class Day16 {
     static void fill2d(long[][] grid, @SuppressWarnings("SameParameterValue") long value) {
         for (var row : grid) {
             Arrays.fill(row, value);
-
         }
     }
 
@@ -116,5 +117,5 @@ Part 2 ideas:
 1. instead of returning on the first time we reach the end, continue checking till we get a result more than the min.
 2. Either costToReach or cameFrom has multiple parents which we can backtrack.
 3. When newCost == existing costToReach value, still add it to the priority queue.
-4. We don't need to explore visited edges again - but we should add the current path as a parent.
+4. We don't need to explore visited edges again, but we should add the current path as a parent (idea of 'open' edges).
  */
