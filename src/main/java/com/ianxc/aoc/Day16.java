@@ -95,6 +95,14 @@ public class Day16 {
         }
     }
 
+    static void fill3d(long[][][] grid, @SuppressWarnings("SameParameterValue") long value) {
+        for (var row : grid) {
+            for (var column : row) {
+                Arrays.fill(column, value);
+            }
+        }
+    }
+
     static void printPath(Point[][] cameFrom, int height, int width) {
         var currI = 1;
         var currJ = width - 2;
@@ -116,14 +124,14 @@ public class Day16 {
         final var width = grid[0].length;
 
         // Initialise costs to visit
-        var costToReach = new long[height][width];
-        fill2d(costToReach, UNSEEN_VAL);
+        var costToReach = new long[height][width][Direction.length];
+        fill3d(costToReach, UNSEEN_VAL);
 
         // A* search
         final var cmp = Comparator.comparingLong(RunningState::priorityCost);
         final var frontier = new PriorityQueue<>(cmp);
         frontier.offer(new RunningState(height - 2, 1, Direction.EAST, 0, List.of(new Point(height - 2, 1))));
-        costToReach[height - 2][1] = 0;
+        costToReach[height - 2][1][Direction.EAST.ordinal()] = 0;
 
         var minTargetCost = UNSEEN_VAL;
         var seenPoints = new HashSet<Point>();
@@ -131,13 +139,13 @@ public class Day16 {
         while (!frontier.isEmpty()) {
             var curr = frontier.poll();
             if (curr.i == 1 && curr.j == width - 2) {
-                if (minTargetCost < costToReach[curr.i][curr.j]) {
+                if (minTargetCost < costToReach[curr.i][curr.j][curr.direction.ordinal()]) {
                     // We must have found all minimum cost paths. Backtrack all parents of (curr.i, curr.j).
                     break;
                 } else {
                     // If first time (minTargetCost > 2^61), then set real min.
                     // If equal, then no change.
-                    minTargetCost = costToReach[curr.i][curr.j];
+                    minTargetCost = costToReach[curr.i][curr.j][curr.direction.ordinal()];
                     System.out.printf("found min target = %d\n", minTargetCost);
                     seenPoints.addAll(curr.history);
                 }
@@ -148,12 +156,13 @@ public class Day16 {
                 var newJ = curr.j + newDir.dj;
                 // Lol, just had to check for E
                 if (grid[newI][newJ] != '#') {
-                    final var newCost = costToReach[curr.i][curr.j] + 1 + (newDir == curr.direction ? 0 : 1000);
+                    final var newCost = costToReach[curr.i][curr.j][curr.direction.ordinal()] + 1 + (newDir == curr.direction ? 0 : 1000);
                     // optimization: skip when we know we will exceed the min target cost
                     if (newCost > minTargetCost) continue;
 
-                    if (newCost < costToReach[newI][newJ]) {
-                        costToReach[newI][newJ] = newCost;
+                    // Need 3D array + <=
+                    if (newCost <= costToReach[newI][newJ][newDir.ordinal()]) {
+                        costToReach[newI][newJ][newDir.ordinal()] = newCost;
                         final var newPriority = newCost + heuristic(newI, newJ, height, width);
                         final var newHistory = new ArrayList<>(curr.history);
                         newHistory.add(new Point(newI, newJ));
