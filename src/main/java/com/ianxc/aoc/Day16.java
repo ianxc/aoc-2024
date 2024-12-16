@@ -1,10 +1,42 @@
 package com.ianxc.aoc;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
+
+enum Direction {
+    EAST(0, 1),
+    NORTH(-1, 0),
+    WEST(0, -1),
+    SOUTH(1, 0);
+
+    static final Direction[] values = Direction.values();
+    static final int length = values.length;
+    final int di;
+    final int dj;
+
+    Direction(int di, int dj) {
+        this.di = di;
+        this.dj = dj;
+    }
+
+    Direction prev() {
+        return Direction.values[Math.floorMod(this.ordinal() - 1, Direction.length)];
+    }
+
+    Direction next() {
+        return Direction.values[(this.ordinal() + 1) % Direction.length];
+    }
+
+    List<Direction> nextDirs() {
+        return List.of(this, this.prev(), this.next());
+    }
+}
 
 @SuppressWarnings("DuplicatedCode")
 public class Day16 {
@@ -36,7 +68,7 @@ public class Day16 {
                 var newI = curr.i + newDir.di;
                 var newJ = curr.j + newDir.dj;
                 // Lol, just had to check for E
-                if (grid[newI][newJ] == '.' || grid[newI][newJ] == 'E') {
+                if (grid[newI][newJ] != '#') {
                     final var newCost = costToReach[curr.i][curr.j] + 1 + (newDir == curr.direction ? 0 : 1000);
                     if (newCost < costToReach[newI][newJ]) {
                         costToReach[newI][newJ] = newCost;
@@ -65,14 +97,6 @@ public class Day16 {
         }
     }
 
-    static void fill3d(long[][][] grid, @SuppressWarnings("SameParameterValue") long value) {
-        for (var row : grid) {
-            for (var section : row) {
-                Arrays.fill(section, value);
-            }
-        }
-    }
-
     static void printPath(Point[][] cameFrom, int height, int width) {
         var currI = 1;
         var currJ = width - 2;
@@ -94,8 +118,8 @@ public class Day16 {
         final var width = grid[0].length;
 
         // Initialise costs to visit
-        var costToReach = new long[height][width][Direction.length];
-        fill3d(costToReach, UNSEEN_VAL);
+        var costToReach = new long[height][width];
+        fill2d(costToReach, UNSEEN_VAL);
 
         // A 3d array to store if we have a min cost parent reaching this node.
         // Note that the direction is *from* the (curr) to the (new), so backtracking will require
@@ -106,21 +130,20 @@ public class Day16 {
         final var cmp = Comparator.comparingLong(State::priorityCost);
         final var frontier = new PriorityQueue<>(cmp);
         frontier.offer(new State(height - 2, 1, Direction.EAST, 0));
-        costToReach[height - 2][1][Direction.EAST.ordinal()] = 0;
+        costToReach[height - 2][1] = 0;
         var minTargetCost = UNSEEN_VAL;
 
         while (!frontier.isEmpty()) {
             var curr = frontier.poll();
             if (curr.i == 1 && curr.j == width - 2) {
-                if (minTargetCost < costToReach[curr.i][curr.j][curr.direction.ordinal()]) {
+                if (minTargetCost < costToReach[curr.i][curr.j]) {
                     // We must have found all minimum cost paths. Backtrack all parents of (curr.i, curr.j).
-                    return getAllParents(minCostParents, curr.i, curr.j).size();
+                    break;
                 } else {
                     // If first time (minTargetCost > 2^61), then set real min.
                     // If equal, then no change.
-                    minTargetCost = costToReach[curr.i][curr.j][curr.direction.ordinal()];
-                    return costToReach[curr.i][curr.j][curr.direction.ordinal()];
-
+                    minTargetCost = costToReach[curr.i][curr.j];
+                    System.out.printf("found min target = %d\n", minTargetCost);
                 }
             }
 
@@ -128,14 +151,20 @@ public class Day16 {
                 var newI = curr.i + newDir.di;
                 var newJ = curr.j + newDir.dj;
                 // Lol, just had to check for E
-                if (grid[newI][newJ] == '.' || grid[newI][newJ] == 'E') {
-                    final var newCost = costToReach[curr.i][curr.j][curr.direction.ordinal()] + 1 + (newDir == curr.direction ? 0 : 1000);
+                if (grid[newI][newJ] != '#') {
+                    final var newCost = costToReach[curr.i][curr.j] + 1 + (newDir == curr.direction ? 0 : 1000);
                     // optimization: skip when we know we will exceed the min target cost
                     if (newCost > minTargetCost) continue;
 
-                    if (newCost < costToReach[newI][newJ][newDir.ordinal()]) {
-                        costToReach[newI][newJ][newDir.ordinal()] = newCost;
+                    var existingNewCost = costToReach[newI][newJ];
+                    if (newCost == existingNewCost) {
+                        System.out.println("got equal cost");
+                        minCostParents[newI][newJ][newDir.ordinal()] = true;
+
+                    } else if (newCost < existingNewCost) {
+                        costToReach[newI][newJ] = newCost;
                         // For min cost backtracking
+//                        Arrays.fill(minCostParents[newI][newJ], false);
                         minCostParents[newI][newJ][newDir.ordinal()] = true;
                         final var newPriority = newCost + heuristic(newI, newJ, height, width);
                         final var newState = new State(newI, newJ, newDir, newPriority);
@@ -144,41 +173,33 @@ public class Day16 {
                 }
             }
         }
-        return -1;
+        return getAllParents(minCostParents, 1, width - 2).size();
     }
 
-    private static Set<Point> getAllParents(boolean[][][] minCostParents, int i, int j) {
-        return Set.of();
+    private static Set<Point> getAllParents(boolean[][][] minCostParents, final int i, final int j) {
+        var seen = new LinkedHashSet<Point>();
+        var queue = new ArrayDeque<Point>();
+        var initial = new Point(i, j);
+        queue.offer(initial);
+        seen.add(initial);
+        while (!queue.isEmpty()) {
+            var curr = queue.poll();
+            for (int d = 0; d < Direction.length; d++) {
+                if (minCostParents[curr.i][curr.j][d]) {
+                    var currDir = Direction.values[d];
+                    var newI = curr.i - currDir.di;
+                    var newJ = curr.j - currDir.dj;
+                    var p = new Point(newI, newJ);
+                    queue.offer(p);
+                    seen.add(p);
+                }
+            }
+        }
+        seen.forEach(System.out::println);
+        return seen;
+
     }
 
-    enum Direction {
-        EAST(0, 1),
-        NORTH(-1, 0),
-        WEST(0, -1),
-        SOUTH(1, 0);
-
-        static final Direction[] values = Direction.values();
-        static final int length = values.length;
-        final int di;
-        final int dj;
-
-        Direction(int di, int dj) {
-            this.di = di;
-            this.dj = dj;
-        }
-
-        Direction prev() {
-            return Direction.values[Math.floorMod(this.ordinal() - 1, Direction.length)];
-        }
-
-        Direction next() {
-            return Direction.values[(this.ordinal() + 1) % Direction.length];
-        }
-
-        List<Direction> nextDirs() {
-            return List.of(this, this.prev(), this.next());
-        }
-    }
 
     record State(int i, int j, Direction direction, long priorityCost) {
     }
