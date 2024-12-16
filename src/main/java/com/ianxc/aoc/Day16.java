@@ -114,3 +114,11 @@ public class Day16 {
     record Point(int i, int j) {
     }
 }
+
+/*
+Part 2 ideas:
+1. instead of returning on the first time we reach the end, continue checking till we get a result more than the min.
+2. Either costToReach or cameFrom has multiple parents which we can backtrack.
+3. When newCost == existing costToReach value, still add it to the priority queue.
+4. We don't need to explore visited edges again - but we should add the current path as a parent.
+ */
