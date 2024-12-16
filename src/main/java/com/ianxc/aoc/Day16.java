@@ -1,13 +1,11 @@
 package com.ianxc.aoc;
 
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Set;
 
 enum Direction {
     EAST(0, 1),
@@ -121,17 +119,14 @@ public class Day16 {
         var costToReach = new long[height][width];
         fill2d(costToReach, UNSEEN_VAL);
 
-        // A 3d array to store if we have a min cost parent reaching this node.
-        // Note that the direction is *from* the (curr) to the (new), so backtracking will require
-        // *going in the opposite direction*.
-        var minCostParents = new boolean[height][width][Direction.length];
-
         // A* search
-        final var cmp = Comparator.comparingLong(State::priorityCost);
+        final var cmp = Comparator.comparingLong(RunningState::priorityCost);
         final var frontier = new PriorityQueue<>(cmp);
-        frontier.offer(new State(height - 2, 1, Direction.EAST, 0));
+        frontier.offer(new RunningState(height - 2, 1, Direction.EAST, 0, List.of(new Point(height - 2, 1))));
         costToReach[height - 2][1] = 0;
+
         var minTargetCost = UNSEEN_VAL;
+        var seenPoints = new HashSet<Point>();
 
         while (!frontier.isEmpty()) {
             var curr = frontier.poll();
@@ -144,6 +139,7 @@ public class Day16 {
                     // If equal, then no change.
                     minTargetCost = costToReach[curr.i][curr.j];
                     System.out.printf("found min target = %d\n", minTargetCost);
+                    seenPoints.addAll(curr.history);
                 }
             }
 
@@ -156,52 +152,25 @@ public class Day16 {
                     // optimization: skip when we know we will exceed the min target cost
                     if (newCost > minTargetCost) continue;
 
-                    var existingNewCost = costToReach[newI][newJ];
-                    if (newCost == existingNewCost) {
-                        System.out.println("got equal cost");
-                        minCostParents[newI][newJ][newDir.ordinal()] = true;
-
-                    } else if (newCost < existingNewCost) {
+                    if (newCost < costToReach[newI][newJ]) {
                         costToReach[newI][newJ] = newCost;
-                        // For min cost backtracking
-//                        Arrays.fill(minCostParents[newI][newJ], false);
-                        minCostParents[newI][newJ][newDir.ordinal()] = true;
                         final var newPriority = newCost + heuristic(newI, newJ, height, width);
-                        final var newState = new State(newI, newJ, newDir, newPriority);
+                        final var newHistory = new ArrayList<>(curr.history);
+                        newHistory.add(new Point(newI, newJ));
+                        final var newState = new RunningState(newI, newJ, newDir, newPriority, newHistory);
                         frontier.offer(newState);
                     }
                 }
             }
         }
-        return getAllParents(minCostParents, 1, width - 2).size();
-    }
-
-    private static Set<Point> getAllParents(boolean[][][] minCostParents, final int i, final int j) {
-        var seen = new LinkedHashSet<Point>();
-        var queue = new ArrayDeque<Point>();
-        var initial = new Point(i, j);
-        queue.offer(initial);
-        seen.add(initial);
-        while (!queue.isEmpty()) {
-            var curr = queue.poll();
-            for (int d = 0; d < Direction.length; d++) {
-                if (minCostParents[curr.i][curr.j][d]) {
-                    var currDir = Direction.values[d];
-                    var newI = curr.i - currDir.di;
-                    var newJ = curr.j - currDir.dj;
-                    var p = new Point(newI, newJ);
-                    queue.offer(p);
-                    seen.add(p);
-                }
-            }
-        }
-        seen.forEach(System.out::println);
-        return seen;
-
+        return seenPoints.size();
     }
 
 
     record State(int i, int j, Direction direction, long priorityCost) {
+    }
+
+    record RunningState(int i, int j, Direction direction, long priorityCost, List<Point> history) {
     }
 
     record Point(int i, int j) {
