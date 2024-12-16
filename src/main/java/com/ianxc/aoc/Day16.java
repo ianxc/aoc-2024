@@ -13,8 +13,6 @@ public class Day16 {
         final var height = grid.length;
         final var width = grid[0].length;
 
-        System.out.println(Arrays.deepToString(grid));
-
         // Initialise costs to visit
         var costToReach = new long[height][width][Direction.length];
         fill3d(costToReach, Long.MAX_VALUE / 2);
@@ -27,7 +25,6 @@ public class Day16 {
 
         while (!frontier.isEmpty()) {
             var curr = frontier.poll();
-            System.out.println("poll  " + curr);
             if (curr.i == 1 && curr.j == width - 2) return costToReach[curr.i][curr.j][curr.direction.ordinal()];
 
             for (var newDir : curr.direction.nextDirs()) {
