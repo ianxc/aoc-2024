@@ -27,8 +27,8 @@ class Day16Test {
 
     @ParameterizedTest
     @CsvSource({
-            "day16/demo.txt, 7036",
-            "day16/demo2.txt, 11048"
+            "day16/demo.txt, 45",
+            "day16/demo2.txt, 64"
     })
     void testPart2Demo(String path, long expected) {
         var res = Day16.part2(path);
