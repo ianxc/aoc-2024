@@ -20,10 +20,24 @@ class Day02Test {
     }
 
     @Test
+    void testPart1Demo() {
+        var res = Day02.part1("day02/demo.txt");
+
+        assertEquals(2, res);
+    }
+
+    @Test
     void testPart1() {
         var res = Day02.part1("day02/input.txt");
 
         assertEquals(383, res);
+    }
+
+    @Test
+    void testPart2Demo() {
+        var res = Day02.part2("day02/demo.txt");
+
+        assertEquals(4, res);
     }
 
     @Test

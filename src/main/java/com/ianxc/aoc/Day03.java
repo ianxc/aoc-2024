@@ -29,7 +29,7 @@ public class Day03 {
 
     static int part2(String path) {
         var total = 0;
-        var mem = String.join("", Util.loadFile("day03/input.txt"));
+        var mem = String.join("", Util.loadFile(path));
 
         var treeSet = new TreeSet<>(cmp);
         var doMatcher = do2.matcher(mem);

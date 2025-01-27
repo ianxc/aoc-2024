@@ -5,12 +5,25 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class Day05Test {
+    @Test
+    void testPart1Demo() {
+        var res = Day05.part1("day05/demo.txt");
+
+        assertEquals(143, res);
+    }
 
     @Test
     void testPart1() {
         var res = Day05.part1("day05/input.txt");
 
         assertEquals(5588, res);
+    }
+
+    @Test
+    void testPart2Demo() {
+        var res = Day05.part2("day05/demo.txt");
+
+        assertEquals(123, res);
     }
 
     @Test
