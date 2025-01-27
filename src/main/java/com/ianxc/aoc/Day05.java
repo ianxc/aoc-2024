@@ -63,7 +63,7 @@ public class Day05 {
                     Collections.reverse(processed);
                     return processed;
                 })
-//                .peek(System.out::println)
+                // .peek(System.out::println)
                 .mapToInt(Day05::middleElement)
                 .sum();
     }

@@ -39,7 +39,7 @@ public class Day14 {
 
     static Robot parseRow(String s) {
         var m = rowPattern.matcher(s);
-        //noinspection ResultOfMethodCallIgnored
+        // noinspection ResultOfMethodCallIgnored
         m.find();
         return new Robot(
                 Integer.parseInt(m.group(1)),

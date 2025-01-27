@@ -80,18 +80,18 @@ public class Day10 {
     }
 
     static int dfs2(Map<Point, Integer> memo, int i, int j, int currentValue, int[][] grid) {
-//        System.out.printf("enter      i=%d, j=%d, cv=%d, memo=%s\n", i, j, currentValue, memo);
+        // System.out.printf("enter      i=%d, j=%d, cv=%d, memo=%s\n", i, j, currentValue, memo);
         var currPoint = new Point(i, j);
 
         var countOrNull = memo.get(currPoint);
         if (countOrNull != null) {
-//            System.out.printf("exit  MEMO countOrNull=%d\n", countOrNull);
+            // System.out.printf("exit  MEMO countOrNull=%d\n", countOrNull);
             return countOrNull;
         }
 
         if (currentValue == 9) {
             memo.put(currPoint, 1);
-//            System.out.printf("exit  DONE i=%d, j=%d\n", i, j);
+            // System.out.printf("exit  DONE i=%d, j=%d\n", i, j);
             return 1;
         }
 
