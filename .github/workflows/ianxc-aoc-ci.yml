@@ -34,10 +34,14 @@ jobs:
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
       - name: Unlock git-crypt
+        env:
+          GIT_CRYPT: ${{ secrets.GIT_CRYPT }}
         run: ./crypt-unlock.sh
 
       - name: Build with Gradle Wrapper
-        run: SUPPRESS_PRINT=true ./gradlew build
+        env:
+          SUPPRESS_PRINT: true
+        run: ./gradlew build
 
   dependency-submission:
     runs-on: ubuntu-latest
