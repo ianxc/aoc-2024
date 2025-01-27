@@ -10,7 +10,7 @@ public class Day04 {
         }
 
         var x = input.toArray(char[][]::new);
-        //        System.out.println(Arrays.deepToString(x));
+        // System.out.println(Arrays.deepToString(x));
         final var height = x.length;
         final var width = x[0].length;
         final var initial = 3;

@@ -146,7 +146,7 @@ public class Day16 {
                     // If first time (minTargetCost > 2^61), then set real min.
                     // If equal, then no change.
                     minTargetCost = costToReach[curr.i][curr.j][curr.direction.ordinal()];
-                    System.out.printf("found min target = %d\n", minTargetCost);
+                    // System.out.printf("found min target = %d\n", minTargetCost);
                     seenPoints.addAll(curr.history);
                 }
             }
@@ -192,4 +192,4 @@ Part 2 ideas: (2d or 3d array?)
 2. Either costToReach or cameFrom has multiple parents which we can backtrack.
 3. When newCost == existing costToReach value, still add it to the priority queue.
 4. We don't need to explore visited edges again, but we should add the current path as a parent (idea of 'open' edges).
- */
+*/
