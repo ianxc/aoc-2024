@@ -66,7 +66,7 @@ public class Day14 {
             }
             if (checkIsXmas(robots, height, width)) {
                 return i;
-            };
+            }
         }
 
         return -1;

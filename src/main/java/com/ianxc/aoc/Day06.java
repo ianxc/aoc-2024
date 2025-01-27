@@ -94,7 +94,7 @@ public class Day06 {
         final var xMax = g.length;
         final var yMax = g[0].length;
         final var guard = findGuard(g);
-        return (int)IntStream.range(0, xMax)
+        return (int) IntStream.range(0, xMax)
                 .parallel()
                 .mapToLong(i ->
                         IntStream.range(0, yMax)

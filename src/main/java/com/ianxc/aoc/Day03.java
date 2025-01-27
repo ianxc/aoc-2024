@@ -11,13 +11,11 @@ public class Day03 {
 
     static Pattern do2 = Pattern.compile("do\\(\\)");
     static Pattern dont2 = Pattern.compile("don't\\(\\)");
-
-    record DPoint(int index, boolean isDo) {}
     static Comparator<DPoint> cmp = Comparator.comparing(DPoint::index);
 
     static int part1(String path) {
         var total = 0;
-        for (var line: Util.loadFile(path)) {
+        for (var line : Util.loadFile(path)) {
             var matcher = p.matcher(line);
             while (matcher.find()) {
                 var d1 = Integer.parseInt(matcher.group(1));
@@ -57,5 +55,8 @@ public class Day03 {
             }
         }
         return total;
+    }
+
+    record DPoint(int index, boolean isDo) {
     }
 }
