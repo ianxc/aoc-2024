@@ -1,9 +1,11 @@
 package com.ianxc.aoc;
 
+import com.ianxc.aoc.util.WithSilencePrintOutput;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@WithSilencePrintOutput
 public class Day04Test {
     @Test
     void testPart1Demo() {
