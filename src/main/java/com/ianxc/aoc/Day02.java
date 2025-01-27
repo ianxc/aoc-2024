@@ -24,7 +24,7 @@ public class Day02 {
         var m = ints[0] < ints[1] ? 1 : -1;
         var ok = true;
         for (int i = 1; i < ints.length; i++) {
-            var diff = ints[i] - ints[i-1];
+            var diff = ints[i] - ints[i - 1];
             diff *= m;
             if (diff < 1 || diff > 3) {
                 ok = false;
@@ -37,7 +37,7 @@ public class Day02 {
 
     static int part2(String path) {
         var sum = 0;
-        for (var line: Util.loadFile(path)) {
+        for (var line : Util.loadFile(path)) {
             var ints = splitToInts(line);
             sum += computeContribution2(ints);
         }

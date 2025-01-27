@@ -92,8 +92,8 @@ public class Day09 {
 
         var checksum = 0L;
         var checksumPosition = 0;
-        for (var r: regions) {
-            for (var b: r.getBlocks()) {
+        for (var r : regions) {
+            for (var b : r.getBlocks()) {
                 for (int i = 0; i < b.count; i++) {
                     checksum += checksumPosition * b.fileId;
                     checksumPosition++;

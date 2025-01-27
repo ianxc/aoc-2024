@@ -75,7 +75,7 @@ public class Day13 {
         // Use Cramer's rule
         var d = det(s.a.x, s.b.x, s.a.y, s.b.y);
         var da = det(s.prize.x, s.b.x, s.prize.y, s.b.y);
-        var db  = det(s.a.x, s.prize.x, s.a.y, s.prize.y);
+        var db = det(s.a.x, s.prize.x, s.a.y, s.prize.y);
         var aPresses = da / d;
         var bPresses = db / d;
         if (aPresses * s.a.x + bPresses * s.b.x != s.prize.x || aPresses * s.a.y + bPresses * s.b.y != s.prize.y) {
