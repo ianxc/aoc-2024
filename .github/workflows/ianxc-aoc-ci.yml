@@ -46,7 +46,7 @@ jobs:
       - name: Build with Gradle Wrapper
         env:
           SUPPRESS_PRINT: true
-        run: ./gradlew build
+        run: ./gradlew build --parallel
 
   dependency-submission:
     runs-on: ubuntu-latest
